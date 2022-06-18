@@ -20,10 +20,6 @@ public class NbpService {
 
     }
 
-//    public Root getCurrency(double topCount,String code ){
-//        Root response = restTemplate.getForObject(NPB_URL+table+"/{code}/last/{topCount}/",Root.class,code, topCount);
-//        return response;
-//    }
     public Root getCurrency(String code, String startDate,String endDate){
         Root response = restTemplate.getForObject(NPB_URL+table+"/{code}/{startDate}/{endDate}//",Root.class,code,startDate,endDate);
         return response;
