@@ -1,27 +1,35 @@
 package com.example.jazs22628nbp.services;
 
 
+import com.example.jazs22628nbp.models.Currency;
 import com.example.jazs22628nbp.models.Root;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import com.example.jazs22628nbp.repository.NbpRepository;
+
+import java.util.Objects;
 
 
 @Service
 public class NbpService {
     private final RestTemplate restTemplate;
+    private final CurrencyFactory currencyFactory;
+    private final NbpRepository nbpRepository;
 
     private static final String NPB_URL = "http://api.nbp.pl/api/exchangerates/rates/";
     private static final String table = "a";
 
-    public NbpService(RestTemplate restTemplate) {
+    public NbpService(RestTemplate restTemplate, CurrencyFactory currencyFactory, NbpRepository nbpRepository) {
         this.restTemplate = restTemplate;
-
+        this.currencyFactory = currencyFactory;
+        this.nbpRepository = nbpRepository;
     }
 
-    public Root getCurrency(String code, String startDate,String endDate){
+    public Currency getCurrency(String code, String startDate, String endDate){
         Root response = restTemplate.getForObject(NPB_URL+table+"/{code}/{startDate}/{endDate}//",Root.class,code,startDate,endDate);
-        return response;
+        Currency currency = currencyFactory.getMeanCurrency(Objects.requireNonNull(response),startDate,endDate);
+        return nbpRepository.save(currency);
     }
+
 }
